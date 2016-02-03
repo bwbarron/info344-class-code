@@ -22,7 +22,7 @@ var ghStrategy = new GithubStrategy(
 
 var cookieSigSecret = process.env.COOKIE_SIG_SECRET;
 if (!cookieSigSecret) {
-    console.error('please set COOKIE_SET_SECRET');
+    console.error('please set COOKIE_SIG_SECRET');
     process.exit(1);
 }
 
@@ -64,9 +64,14 @@ app.use(express.static(__dirname + '/static/public'));
 app.use(function (req, res, next) {
     // check if user is authenticated before giving access to /secure
     // use req.isAuthenticated()
-    next();
+    if (req.isAuthenticated()) next();
 });
 app.use(express.static(__dirname + '/static/secure'));
+
+app.get('api/v1/user/me', function (req, res) {
+    // req.user is currently authenticated user
+    res.json(req.user);
+});
 
 app.listen(80, function () {
     console.log('server is listening');
